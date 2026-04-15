@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ApiClientError, cloneVoice, previewVoice } from '../../lib/api';
 import { useRecorder } from '../../hooks/useRecorder';
 
@@ -37,21 +37,16 @@ export default function VoiceCloner({ onComplete }: VoiceClonerProps) {
   const [error, setError] = useState<string | null>(null);
 
   const recorder = useRecorder();
-  const recordedUrlRef = useRef<string | null>(null);
+  const [recordedAudioUrl, setRecordedAudioUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (recordedUrlRef.current) {
-      URL.revokeObjectURL(recordedUrlRef.current);
-      recordedUrlRef.current = null;
+    if (!recorder.recordedBlob) {
+      setRecordedAudioUrl(null);
+      return;
     }
-    if (recorder.recordedBlob) {
-      recordedUrlRef.current = URL.createObjectURL(recorder.recordedBlob);
-    }
-    return () => {
-      if (recordedUrlRef.current) {
-        URL.revokeObjectURL(recordedUrlRef.current);
-      }
-    };
+    const url = URL.createObjectURL(recorder.recordedBlob);
+    setRecordedAudioUrl(url);
+    return () => URL.revokeObjectURL(url);
   }, [recorder.recordedBlob]);
 
   useEffect(() => {
@@ -59,8 +54,6 @@ export default function VoiceCloner({ onComplete }: VoiceClonerProps) {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
-
-  const recordedAudioUrl = recordedUrlRef.current;
   const canSubmit =
     doctorName.trim().length >= 2 &&
     !isCloning &&
