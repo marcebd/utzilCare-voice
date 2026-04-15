@@ -9,3 +9,4 @@ build/
 .vite/
 coverage/
 .turbo/
+*.tsbuildinfo
