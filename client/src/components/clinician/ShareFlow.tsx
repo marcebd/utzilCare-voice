@@ -96,20 +96,20 @@ export default function ShareFlow({
         code. The link works for 24 hours.
       </p>
 
-      <div className="mt-8 grid gap-8 md:grid-cols-[1fr_240px]">
-        <div className="space-y-4">
+      <div className="mt-8 grid gap-8 md:grid-cols-[minmax(0,1fr)_240px]">
+        <div className="min-w-0 space-y-4">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-stone-500">
               Patient link
             </p>
-            <div className="mt-2 flex items-center gap-2 rounded-md border border-stone-200 bg-stone-50 px-3 py-2">
-              <code className="flex-1 truncate font-mono text-sm text-stone-800">
+            <div className="mt-2 flex items-start gap-2 rounded-md border border-stone-200 bg-stone-50 px-3 py-2">
+              <code className="min-w-0 flex-1 break-all font-mono text-sm text-stone-800">
                 {patientUrl}
               </code>
               <button
                 type="button"
                 onClick={() => void handleCopy()}
-                className="shrink-0 rounded-md bg-forest-800 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-forest-700 focus:outline-none focus:ring-2 focus:ring-forest-600 focus:ring-offset-2 focus:ring-offset-stone-50"
+                className="mt-0.5 shrink-0 rounded-md bg-forest-800 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-forest-700 focus:outline-none focus:ring-2 focus:ring-forest-600 focus:ring-offset-2 focus:ring-offset-stone-50"
                 aria-label="Copy patient link to clipboard"
               >
                 {copied ? 'Copied' : 'Copy'}

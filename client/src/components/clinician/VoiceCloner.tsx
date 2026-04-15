@@ -313,23 +313,64 @@ export default function VoiceCloner({ onComplete }: VoiceClonerProps) {
           ) : null}
 
           {recorder.status === 'stopped' && recordedAudioUrl ? (
-            <div className="space-y-3">
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-stone-500">
-                Recorded · {formatDuration(recorder.elapsedSeconds)}
-              </p>
+            <div className="rounded-lg border border-forest-600 bg-forest-50 p-5">
+              <div className="flex items-start gap-3">
+                <div
+                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-forest-800 text-white"
+                  aria-hidden="true"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-3.5 w-3.5"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-forest-900">
+                    Recording saved — {formatDuration(recorder.elapsedSeconds)}
+                  </p>
+                  <p className="mt-1 text-sm text-forest-800/80">
+                    Listen back and make sure it sounds like you before
+                    cloning.
+                  </p>
+                </div>
+              </div>
+
               <audio
                 controls
                 src={recordedAudioUrl}
-                className="w-full"
-                aria-label="Preview of your recording"
+                className="mt-4 w-full"
+                aria-label="Listen to your recording"
               />
-              <button
-                type="button"
-                onClick={recorder.reset}
-                className="text-sm text-stone-600 underline decoration-stone-300 underline-offset-2 hover:decoration-stone-500"
-              >
-                Discard and record again
-              </button>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={recorder.reset}
+                  className="inline-flex items-center gap-2 rounded-md border border-forest-600 bg-white px-4 py-2 text-sm font-medium text-forest-800 transition hover:bg-forest-50 focus:outline-none focus:ring-2 focus:ring-forest-600 focus:ring-offset-2 focus:ring-offset-forest-50"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  >
+                    <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+                    <polyline points="3 3 3 8 8 8" />
+                  </svg>
+                  Re-record
+                </button>
+              </div>
             </div>
           ) : null}
 
