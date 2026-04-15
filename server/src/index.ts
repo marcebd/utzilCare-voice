@@ -8,6 +8,7 @@ import { errorHandler } from './middleware/error-handler.js';
 import { getSessionStore } from './lib/sessions.js';
 import { cloneRouter } from './routes/clone.js';
 import { generateRouter } from './routes/generate.js';
+import { agentRouter } from './routes/agent.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,6 +36,7 @@ getSessionStore();
 
 app.use('/api', cloneRouter);
 app.use('/api', generateRouter);
+app.use('/api', agentRouter);
 
 app.use(errorHandler);
 
