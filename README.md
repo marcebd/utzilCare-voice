@@ -46,6 +46,16 @@ npm run dev:server     # http://localhost:4000
 npm run dev:client     # http://localhost:5173
 ```
 
+## Deployment
+
+- **Frontend:** Vercel reads `vercel.json` at the repo root, builds the `client`
+  workspace, serves `client/dist`, and falls through to `index.html` for SPA routes.
+  Set `VITE_API_URL` to the deployed server URL.
+- **Backend:** Railway reads `railway.json` at the repo root, builds the `server`
+  workspace, and runs `node dist/index.js`. Set `ELEVENLABS_API_KEY`,
+  `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, and `CORS_ORIGIN` (the Vercel
+  frontend URL) in the Railway environment.
+
 ## License
 
 MIT
