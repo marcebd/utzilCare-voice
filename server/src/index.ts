@@ -6,6 +6,7 @@ import { dirname, resolve } from 'node:path';
 import { apiLimiter } from './middleware/rate-limit.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { getSessionStore } from './lib/sessions.js';
+import { cloneRouter } from './routes/clone.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,6 +31,8 @@ app.get('/health', (_req: Request, res: Response) => {
 
 // Initialize session store at boot so the in-memory fallback warning fires once.
 getSessionStore();
+
+app.use('/api', cloneRouter);
 
 app.use(errorHandler);
 
