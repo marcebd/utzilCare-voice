@@ -14,6 +14,9 @@ const ACCEPTED_MIME = new Set([
   'audio/x-wav',
   'audio/webm',
   'audio/ogg',
+  'audio/mp4',
+  'audio/m4a',
+  'audio/x-m4a',
 ]);
 
 const upload = multer({
