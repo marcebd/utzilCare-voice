@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import VoiceCloner from '../components/clinician/VoiceCloner';
 import InstructionComposer from '../components/clinician/InstructionComposer';
+import ShareFlow from '../components/clinician/ShareFlow';
 import type { Language, Speed } from '../types';
 
 type Step = 'clone' | 'compose' | 'share';
@@ -65,19 +66,17 @@ export default function ClinicianView() {
       ) : null}
 
       {step === 'share' && state.sessionId ? (
-        <section className="rounded-xl border border-stone-200 bg-white p-8 text-stone-500">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-stone-400">
-            Step 3 of 3
-          </p>
-          <h2 className="font-display mt-2 text-2xl text-stone-800">Share</h2>
-          <p className="mt-2">
-            Session created:{' '}
-            <span className="font-mono text-stone-700">{state.sessionId}</span>
-          </p>
-          <p className="mt-1 text-sm">
-            Patient URL + QR code + preview button land in the next commit.
-          </p>
-        </section>
+        <ShareFlow
+          sessionId={state.sessionId}
+          doctorName={state.doctorName}
+          agentId={state.agentId}
+          primaryLanguage={state.primaryLanguage}
+          speed={state.speed}
+          onRestart={() => {
+            setState(initialState);
+            setStep('clone');
+          }}
+        />
       ) : null}
     </main>
   );
