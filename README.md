@@ -42,7 +42,7 @@ cp .env.example .env   # fill in ELEVENLABS_API_KEY and UPSTASH_* values
 Run client and server in two terminals:
 
 ```bash
-npm run dev:server     # http://localhost:3001
+npm run dev:server     # http://localhost:4000
 npm run dev:client     # http://localhost:5173
 ```
 
