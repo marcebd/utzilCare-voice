@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Speed } from '../../types';
+import WaveformScrubber from './WaveformScrubber';
 
 interface AudioPlayerProps {
   src: string;
@@ -67,15 +68,12 @@ export default function AudioPlayer({
     void audio.play();
   };
 
-  const handleSeek = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSeekTo = (time: number) => {
     const audio = audioRef.current;
     if (!audio) return;
-    const value = Number(event.target.value);
-    audio.currentTime = value;
-    setCurrentTime(value);
+    audio.currentTime = time;
+    setCurrentTime(time);
   };
-
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
     <div
@@ -125,21 +123,12 @@ export default function AudioPlayer({
         </button>
 
         <div className="min-w-0 flex-1">
-          <input
-            type="range"
-            min={0}
-            max={duration || 0}
-            step={0.1}
-            value={currentTime}
-            onChange={handleSeek}
-            aria-label="Seek"
-            className="block w-full accent-forest-800"
-            style={{
-              background: `linear-gradient(to right, var(--color-forest-800) 0%, var(--color-forest-800) ${progress}%, var(--color-stone-200) ${progress}%, var(--color-stone-200) 100%)`,
-              appearance: 'none',
-              height: '6px',
-              borderRadius: '9999px',
-            }}
+          <WaveformScrubber
+            src={src}
+            currentTime={currentTime}
+            duration={duration}
+            onSeek={handleSeekTo}
+            ariaLabel="Audio position"
           />
           <div className="mt-2 flex justify-between font-mono text-xs tabular-nums text-stone-500">
             <span aria-label="Current time">{formatTime(currentTime)}</span>
