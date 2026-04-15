@@ -24,6 +24,7 @@ export type ApiErrorCode =
   | 'elevenlabs_quota_exceeded'
   | 'elevenlabs_invalid_voice'
   | 'elevenlabs_unauthorized'
+  | 'elevenlabs_plan_required'
   | 'elevenlabs_unavailable'
   | 'rate_limited'
   | 'internal_error';

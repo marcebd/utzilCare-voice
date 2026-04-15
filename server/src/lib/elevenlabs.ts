@@ -16,7 +16,45 @@ function apiKey(): string {
   return key;
 }
 
+interface ElevenLabsErrorBody {
+  detail?: {
+    status?: string;
+    message?: string;
+    code?: string;
+  } | string;
+}
+
+function parseDetail(body: string): { status?: string; message?: string } {
+  try {
+    const parsed = JSON.parse(body) as ElevenLabsErrorBody;
+    if (parsed.detail && typeof parsed.detail === 'object') {
+      return { status: parsed.detail.status, message: parsed.detail.message };
+    }
+    if (typeof parsed.detail === 'string') {
+      return { message: parsed.detail };
+    }
+  } catch {
+    // ignore — body wasn't JSON
+  }
+  return {};
+}
+
 function mapElevenLabsError(status: number, body: string): ApiError {
+  console.error(`[elevenlabs] ${status} response body:`, body);
+  const detail = parseDetail(body);
+
+  if (
+    status === 402 ||
+    detail.status === 'can_not_use_instant_voice_cloning' ||
+    detail.status === 'paid_plan_required'
+  ) {
+    return new ApiError(
+      402,
+      'elevenlabs_plan_required',
+      detail.message ??
+        'Your ElevenLabs plan does not include this feature. Upgrade at https://elevenlabs.io/app/subscription.',
+    );
+  }
   if (status === 401 || status === 403) {
     return new ApiError(
       502,
@@ -31,7 +69,7 @@ function mapElevenLabsError(status: number, body: string): ApiError {
       'ElevenLabs quota or rate limit reached. Try again shortly or check your plan.',
     );
   }
-  if (status === 404 && /voice/i.test(body)) {
+  if ((status === 404 || status === 400) && /voice/i.test(body)) {
     return new ApiError(
       400,
       'elevenlabs_invalid_voice',
@@ -48,7 +86,7 @@ function mapElevenLabsError(status: number, body: string): ApiError {
   return new ApiError(
     502,
     'elevenlabs_unavailable',
-    `ElevenLabs request failed (${status}).`,
+    detail.message ?? `ElevenLabs request failed (${status}).`,
   );
 }
 
