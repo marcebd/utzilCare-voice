@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useConversation } from '@elevenlabs/react';
 import type { Language } from '../../types';
 import { getConvaiSignedUrl } from '../../lib/api';
@@ -107,24 +107,48 @@ export default function PatientConversation({
     [copy.genericError, copy.micDenied],
   );
 
+  const langRef = useRef(language);
+  langRef.current = language;
+
+  const languageContext = useMemo(
+    () => (lang: Language) => {
+      const name = lang === 'es' ? 'Spanish' : 'English';
+      return `The patient's selected language is ${name}. Respond only in ${name}.`;
+    },
+    [],
+  );
+
+  const handleConnect = useCallback(() => {
+    setErrorMessage(null);
+    setTimeout(() => {
+      conversationRef.current?.sendContextualUpdate(
+        languageContext(langRef.current),
+      );
+    }, 300);
+  }, [languageContext]);
+
+  const conversationRef = useRef<ReturnType<typeof useConversation> | null>(null);
+
   const conversation = useConversation({
     onMessage: handleMessage,
     onError: handleError,
-    onConnect: () => setErrorMessage(null),
+    onConnect: handleConnect,
   });
+
+  conversationRef.current = conversation;
 
   const status = conversation.status;
   const isSpeaking = conversation.isSpeaking;
   const isConnected = status === 'connected';
   const isConnecting = status === 'connecting' || isStarting;
 
+  const prevLangRef = useRef(language);
   useEffect(() => {
+    if (prevLangRef.current === language) return;
+    prevLangRef.current = language;
     if (status !== 'connected') return;
-    const langName = language === 'es' ? 'Spanish' : 'English';
-    conversation.sendContextualUpdate(
-      `The patient has switched to ${langName}. From now on, respond only in ${langName}.`,
-    );
-  }, [language, status, conversation]);
+    conversation.sendContextualUpdate(languageContext(language));
+  }, [language, status, conversation, languageContext]);
 
   const startConversation = async () => {
     if (disabled || isStarting || isConnected) return;
