@@ -69,7 +69,15 @@ function mapElevenLabsError(status: number, body: string): ApiError {
       'ElevenLabs quota or rate limit reached. Try again shortly or check your plan.',
     );
   }
-  if ((status === 404 || status === 400) && /voice/i.test(body)) {
+  if (detail.status === 'voice_limit_reached') {
+    return new ApiError(
+      402,
+      'elevenlabs_quota_exceeded',
+      detail.message ??
+        'You have reached your voice limit. Delete unused voices at elevenlabs.io/app/voice-lab or upgrade your plan.',
+    );
+  }
+  if (status === 404 || (status === 400 && /voice.*not found/i.test(body))) {
     return new ApiError(
       400,
       'elevenlabs_invalid_voice',
