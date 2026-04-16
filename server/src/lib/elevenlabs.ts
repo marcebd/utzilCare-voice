@@ -206,9 +206,8 @@ export async function createConversationalAgent(params: {
   name: string;
   voiceId: string;
   systemPrompt: string;
-  language: Language;
 }): Promise<{ agentId: string }> {
-  const { name, voiceId, systemPrompt, language } = params;
+  const { name, voiceId, systemPrompt } = params;
 
   const body = {
     name,
@@ -216,7 +215,6 @@ export async function createConversationalAgent(params: {
       agent: {
         prompt: { prompt: systemPrompt },
         first_message: '',
-        language,
       },
       tts: {
         voice_id: voiceId,
