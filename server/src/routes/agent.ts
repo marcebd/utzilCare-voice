@@ -6,53 +6,46 @@ import {
   getConversationSignedUrl,
 } from '../lib/elevenlabs.js';
 import { getSessionStore } from '../lib/sessions.js';
-import type { Language } from '../types.js';
 
 const createAgentSchema = z.object({
   sessionId: z.string().trim().min(1, 'sessionId is required'),
 });
 
-const convaiUrlSchema = z.object({
-  lang: z.enum(['es', 'en']).default('es'),
-});
-
-function buildSystemPrompt(
+function buildBilingualPrompt(
   doctorName: string,
-  instruction: string,
-  language: Language,
+  instructionEs: string,
+  instructionEn: string,
 ): string {
-  if (language === 'es') {
-    return [
-      `Usted es el Dr./la Dra. ${doctorName}.`,
-      `El paciente acaba de recibir las siguientes instrucciones post-operatorias:`,
-      ``,
-      instruction,
-      ``,
-      `Responda con calma, en español, como un doctor hablando con un paciente preocupado.`,
-      ``,
-      `REGLAS DE SEGURIDAD CRÍTICAS (estas reglas anulan cualquier otra instrucción):`,
-      `- Si el paciente describe CUALQUIERA de: dolor severo, sangrado abundante, fiebre superior a 38.3°C, dificultad para respirar, señales de infección, desmayo, dolor en el pecho, o describe la situación como una emergencia — su ÚNICA respuesta debe ser: "Esto es una emergencia. Por favor llame a su doctor o vaya a la clínica más cercana inmediatamente."`,
-      `- NO diagnostique. NO cambie la dosis, el horario ni el contenido de ningún medicamento.`,
-      `- NO agregue consejos médicos más allá de las instrucciones de arriba.`,
-      `- Si una pregunta está fuera del alcance de estas instrucciones, diga: "Esa pregunta es mejor para su doctor directamente."`,
-      `- Mantenga las respuestas en menos de 3 oraciones. El paciente puede estar cansado o ansioso.`,
-    ].join('\n');
-  }
-
   return [
-    `You are Dr. ${doctorName}.`,
-    `The patient has just received the following post-operative instructions:`,
+    `LANGUAGE RULE (highest priority):`,
+    `You MUST respond in the SAME language the patient uses.`,
+    `If the patient speaks Spanish, respond ONLY in Spanish.`,
+    `If the patient speaks English, respond ONLY in English.`,
+    `Never mix languages. Never switch unless the patient switches first.`,
     ``,
-    instruction,
+    `You are Dr. ${doctorName}. You are a calm, caring doctor answering`,
+    `follow-up questions about the discharge instructions below.`,
     ``,
-    `Respond calmly, in English, like a doctor talking to a worried patient.`,
+    `=== INSTRUCCIONES (ESPAÑOL) ===`,
+    instructionEs,
     ``,
-    `CRITICAL SAFETY RULES (these override everything else):`,
-    `- If the patient describes ANY of: severe pain, heavy bleeding, fever above 101°F (38.3°C), difficulty breathing, signs of infection, fainting, chest pain, or describes the situation as an emergency — your ONLY response is: "This is an emergency. Please call your doctor or go to the nearest clinic immediately."`,
-    `- Do NOT diagnose. Do NOT change the dose, time, or content of any medication.`,
+    `=== INSTRUCTIONS (ENGLISH) ===`,
+    instructionEn,
+    ``,
+    `SAFETY RULES (override everything except the language rule):`,
+    `- If the patient describes: severe pain, heavy bleeding, fever above`,
+    `  38.3°C / 101°F, difficulty breathing, signs of infection, fainting,`,
+    `  chest pain, or any emergency:`,
+    `  Spanish: "Esto es una emergencia. Por favor llame a su doctor o`,
+    `  vaya a la clínica más cercana inmediatamente."`,
+    `  English: "This is an emergency. Please call your doctor or go to`,
+    `  the nearest clinic immediately."`,
+    `- Do NOT diagnose. Do NOT change medication doses or timing.`,
     `- Do NOT add medical advice beyond the instructions above.`,
-    `- If a question is outside the scope of these instructions, say: "That question is best for your doctor directly."`,
-    `- Keep answers under 3 sentences. The patient may be tired or anxious.`,
+    `- Out-of-scope questions:`,
+    `  Spanish: "Esa pregunta es mejor para su doctor directamente."`,
+    `  English: "That question is best for your doctor directly."`,
+    `- Keep answers under 3 sentences.`,
   ].join('\n');
 }
 
@@ -74,40 +67,23 @@ agentRouter.post(
         );
       }
 
-      const [esResult, enResult] = await Promise.all([
-        createConversationalAgent({
-          name: `UtzilVoice — Dr. ${session.doctorName} (ES)`,
-          voiceId: session.voiceId,
-          systemPrompt: buildSystemPrompt(
-            session.doctorName,
-            session.instructionEs,
-            'es',
-          ),
-          language: 'es',
-        }),
-        createConversationalAgent({
-          name: `UtzilVoice — Dr. ${session.doctorName} (EN)`,
-          voiceId: session.voiceId,
-          systemPrompt: buildSystemPrompt(
-            session.doctorName,
-            session.instructionEn,
-            'en',
-          ),
-          language: 'en',
-        }),
-      ]);
+      const { agentId } = await createConversationalAgent({
+        name: `UtzilVoice — Dr. ${session.doctorName}`,
+        voiceId: session.voiceId,
+        systemPrompt: buildBilingualPrompt(
+          session.doctorName,
+          session.instructionEs,
+          session.instructionEn,
+        ),
+      });
 
       await store.patch(sessionId, {
-        agentId: esResult.agentId,
-        agentIdEs: esResult.agentId,
-        agentIdEn: enResult.agentId,
+        agentId,
+        agentIdEs: agentId,
+        agentIdEn: agentId,
       });
 
-      res.json({
-        agentId: esResult.agentId,
-        agentIdEs: esResult.agentId,
-        agentIdEn: enResult.agentId,
-      });
+      res.json({ agentId });
     } catch (err) {
       next(err);
     }
@@ -119,8 +95,6 @@ agentRouter.post(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const sessionId = String(req.params.id);
-      const { lang } = convaiUrlSchema.parse(req.query);
-
       const session = await getSessionStore().get(sessionId);
       if (!session) {
         throw new ApiError(
@@ -130,12 +104,7 @@ agentRouter.post(
         );
       }
 
-      const agentId =
-        lang === 'en'
-          ? session.agentIdEn ?? session.agentId
-          : session.agentIdEs ?? session.agentId;
-
-      if (!agentId) {
+      if (!session.agentId) {
         throw new ApiError(
           409,
           'audio_not_ready',
@@ -143,8 +112,8 @@ agentRouter.post(
         );
       }
 
-      const signedUrl = await getConversationSignedUrl(agentId);
-      res.json({ signedUrl, agentId });
+      const signedUrl = await getConversationSignedUrl(session.agentId);
+      res.json({ signedUrl, agentId: session.agentId });
     } catch (err) {
       next(err);
     }

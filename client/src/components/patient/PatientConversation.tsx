@@ -30,7 +30,6 @@ const COPY = {
     startButton: 'Iniciar conversación',
     endButton: 'Terminar',
     connecting: 'Conectando…',
-    reconnecting: 'Cambiando idioma…',
     agentSpeaking: 'Su doctor está hablando',
     listening: 'Escuchando',
     idle: 'Diga algo o escriba su pregunta',
@@ -53,7 +52,6 @@ const COPY = {
     startButton: 'Start conversation',
     endButton: 'End',
     connecting: 'Connecting\u2026',
-    reconnecting: 'Switching language\u2026',
     agentSpeaking: 'Your doctor is speaking',
     listening: 'Listening',
     idle: 'Say something or type your question',
@@ -87,9 +85,6 @@ export default function PatientConversation({
   const [textInput, setTextInput] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
-  const [isReconnecting, setIsReconnecting] = useState(false);
-  const hasConnectedOnce = useRef(false);
-  const activeLangRef = useRef<Language | null>(null);
 
   const handleMessage = useCallback((msg: unknown) => {
     const m = msg as ConvaiMessage;
@@ -115,10 +110,7 @@ export default function PatientConversation({
   const conversation = useConversation({
     onMessage: handleMessage,
     onError: handleError,
-    onConnect: () => {
-      setErrorMessage(null);
-      setIsReconnecting(false);
-    },
+    onConnect: () => setErrorMessage(null),
   });
 
   const status = conversation.status;
@@ -126,22 +118,13 @@ export default function PatientConversation({
   const isConnected = status === 'connected';
   const isConnecting = status === 'connecting' || isStarting;
 
-  const connectForLanguage = useCallback(
-    async (lang: Language) => {
-      const { signedUrl } = await getConvaiSignedUrl(sessionId, lang);
-      await conversation.startSession({ signedUrl });
-      activeLangRef.current = lang;
-    },
-    [sessionId, conversation],
-  );
-
   const startConversation = async () => {
     if (disabled || isStarting || isConnected) return;
     setErrorMessage(null);
     setIsStarting(true);
     try {
-      await connectForLanguage(language);
-      hasConnectedOnce.current = true;
+      const { signedUrl } = await getConvaiSignedUrl(sessionId);
+      await conversation.startSession({ signedUrl });
     } catch (err) {
       handleError(err);
     } finally {
@@ -152,41 +135,10 @@ export default function PatientConversation({
   const endConversation = async () => {
     try {
       await conversation.endSession();
-      hasConnectedOnce.current = false;
-      activeLangRef.current = null;
     } catch (err) {
       console.error('[convai] end session failed', err);
     }
   };
-
-  // When language toggles while connected, reconnect to the agent for that language.
-  const prevLangRef = useRef(language);
-  useEffect(() => {
-    if (prevLangRef.current === language) return;
-    prevLangRef.current = language;
-    if (!hasConnectedOnce.current) return;
-    if (activeLangRef.current === language) return;
-
-    let cancelled = false;
-    setIsReconnecting(true);
-
-    (async () => {
-      try {
-        await conversation.endSession();
-        if (cancelled) return;
-        await connectForLanguage(language);
-      } catch (err) {
-        if (!cancelled) {
-          handleError(err);
-          setIsReconnecting(false);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [language, conversation, connectForLanguage, handleError]);
 
   const sendText = () => {
     const trimmed = textInput.trim();
@@ -218,8 +170,6 @@ export default function PatientConversation({
     container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
   }, [transcript]);
 
-  const showConnectedUI = isConnected || isReconnecting;
-
   return (
     <section
       aria-label={copy.title}
@@ -236,7 +186,7 @@ export default function PatientConversation({
         {copy.localDisclaimer}
       </p>
 
-      {!showConnectedUI ? (
+      {!isConnected ? (
         <div className="mt-5">
           <button
             type="button"
@@ -279,22 +229,16 @@ export default function PatientConversation({
             <div className="flex items-center gap-3">
               <span
                 className={`inline-block h-2.5 w-2.5 rounded-full ${
-                  isReconnecting
-                    ? 'animate-pulse bg-amber-500'
-                    : isSpeaking
-                      ? 'animate-pulse bg-amber-500'
-                      : 'bg-forest-600'
+                  isSpeaking ? 'animate-pulse bg-amber-500' : 'bg-forest-600'
                 }`}
                 aria-hidden="true"
               />
               <p className="text-sm font-medium text-forest-900">
-                {isReconnecting
-                  ? copy.reconnecting
-                  : isSpeaking
-                    ? copy.agentSpeaking
-                    : transcript.length === 0
-                      ? copy.idle
-                      : copy.listening}
+                {isSpeaking
+                  ? copy.agentSpeaking
+                  : transcript.length === 0
+                    ? copy.idle
+                    : copy.listening}
               </p>
             </div>
             <button
@@ -361,12 +305,11 @@ export default function PatientConversation({
               onChange={(e) => setTextInput(e.target.value)}
               placeholder={copy.inputPlaceholder}
               maxLength={400}
-              disabled={isReconnecting}
-              className="flex-1 rounded-md border border-stone-300 bg-white px-3 py-2 text-stone-800 shadow-sm placeholder:text-stone-400 focus:border-forest-700 focus:outline-none focus:ring-1 focus:ring-forest-700 disabled:bg-stone-100"
+              className="flex-1 rounded-md border border-stone-300 bg-white px-3 py-2 text-stone-800 shadow-sm placeholder:text-stone-400 focus:border-forest-700 focus:outline-none focus:ring-1 focus:ring-forest-700"
             />
             <button
               type="submit"
-              disabled={textInput.trim().length === 0 || isReconnecting}
+              disabled={textInput.trim().length === 0}
               className="rounded-md bg-forest-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-forest-700 focus:outline-none focus:ring-2 focus:ring-forest-600 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-500"
             >
               {copy.sendLabel}
