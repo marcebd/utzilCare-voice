@@ -163,9 +163,11 @@ export default function PatientConversation({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const transcriptEndRef = useRef<HTMLDivElement | null>(null);
+  const transcriptRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    transcriptEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    const container = transcriptRef.current;
+    if (!container) return;
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
   }, [transcript]);
 
   return (
@@ -249,6 +251,7 @@ export default function PatientConversation({
           </div>
 
           <div
+            ref={transcriptRef}
             role="log"
             aria-live="polite"
             aria-label={copy.title}
@@ -283,7 +286,6 @@ export default function PatientConversation({
                 ))}
               </ul>
             )}
-            <div ref={transcriptEndRef} />
           </div>
 
           <form
