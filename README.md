@@ -10,6 +10,12 @@
 
 ---
 
+### Demo
+
+<video src="https://github.com/marcebd/utzilCare-voice/raw/main/docs/demo.mp4" controls width="100%"></video>
+
+---
+
 ## The problem this exists to solve
 
 A child in Quetzaltenango has just had cleft palate surgery. Her mother cannot read the discharge sheet. The doctor is already in another consultation. By the time they get home, neither of them remembers exactly when to give the next dose of antibiotics.
