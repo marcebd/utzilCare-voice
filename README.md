@@ -153,7 +153,7 @@ npm run dev:client   # http://localhost:5173
 
 ## What this is (and is not)
 
-**This is** a portfolio demonstration of ElevenLabs' TTS, Voice Cloning, and Conversational AI APIs composed into a real clinical use case. Code is MIT-licensed, open for adaptation.
+**This is** a demonstration of ElevenLabs' TTS, Voice Cloning, and Conversational AI APIs composed into a real clinical use case. Code is MIT-licensed, open for adaptation.
 
 **This is not** a HIPAA-compliant production system. Deploying this tool with identifiable patient instructions requires:
 
@@ -161,7 +161,7 @@ npm run dev:client   # http://localhost:5173
 - A doctor-facing consent flow for voice cloning (a biometric identifier).
 - An audit log for every voice generation and conversation.
 - An offline mode for clinics with unreliable connectivity.
-- A delivery channel — WhatsApp via Twilio, a printed QR card at discharge, or embedding this into the parent [UtzilCare](https://utzilcare.com) clinic workflow.
+- A delivery channel — WhatsApp via Twilio, a printed QR card at discharge, or embedding this into the parent **UtzilCare** clinic workflow.
 
 These belong on the roadmap, not in a first demo.
 
@@ -197,7 +197,7 @@ utzilCare-voice/
 
 ## Credits
 
-Built as a portfolio project by [Marcela Billingslea](https://github.com/marcebd). Clinical motivation from ongoing work with [UtzilCare](https://utzilcare.com), a HIPAA-compliant clinic management platform for healthcare providers in Guatemala. Design language shared with UtzilCare's Ceiba system — forest greens for grounding, amber for the Guatemalan sun, warm cream for the earth.
+Built as a project by [Marcela Billingslea](https://github.com/marcebd). Clinical motivation from ongoing work with **UtzilCare**, a HIPAA-compliant clinic management platform for healthcare providers in Guatemala. Design language shared with UtzilCare's Ceiba system — forest greens for grounding, amber for the Guatemalan sun, warm cream for the earth.
 
 ## License
 
