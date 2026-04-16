@@ -104,6 +104,7 @@ agentRouter.post(
       });
 
       res.json({
+        agentId: esResult.agentId,
         agentIdEs: esResult.agentId,
         agentIdEn: enResult.agentId,
       });
