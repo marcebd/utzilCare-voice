@@ -5,6 +5,7 @@ import type { Language, SessionResponse, Speed } from '../types';
 import AudioPlayer from '../components/patient/AudioPlayer';
 import LanguageToggle from '../components/patient/LanguageToggle';
 import PatientConversation from '../components/patient/PatientConversation';
+import AccessibilityControls from '../components/patient/AccessibilityControls';
 
 function parseLang(value: string | null): Language {
   return value === 'en' ? 'en' : 'es';
@@ -68,6 +69,10 @@ export default function PatientView() {
 
   return (
     <main className="mx-auto max-w-2xl px-5 py-10">
+      <div className="mb-4 flex justify-end">
+        <AccessibilityControls language={language} />
+      </div>
+
       <div
         role="alert"
         className="rounded-md border border-amber-500 bg-amber-50 px-4 py-3 text-sm text-amber-900"

@@ -53,3 +53,50 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+
+/* Accessibility: large text scales all rem-based sizes. */
+html.large-text {
+  font-size: 120%;
+}
+
+/*
+ * Accessibility: high contrast overrides the Ceiba palette tokens so every
+ * Tailwind utility that references them picks up the high-contrast values
+ * automatically. Intentional narrow scope — only the patient-facing colors
+ * used in that route are swapped.
+ */
+html.high-contrast {
+  --color-cream: #ffffff;
+  --color-stone-50: #ffffff;
+  --color-stone-100: #f2f2f2;
+  --color-stone-200: #000000;
+  --color-stone-300: #000000;
+  --color-stone-400: #1a1a1a;
+  --color-stone-500: #0a0a0a;
+  --color-stone-600: #000000;
+  --color-stone-700: #000000;
+  --color-stone-800: #000000;
+  --color-stone-900: #000000;
+  --color-forest-600: #005023;
+  --color-forest-700: #003d1a;
+  --color-forest-800: #002a12;
+  --color-forest-900: #001509;
+  --color-forest-50: #e0f2e5;
+  --color-amber-400: #b45c00;
+  --color-amber-500: #9a4e00;
+  --color-amber-600: #7a3e00;
+  --color-amber-900: #2a1500;
+  --color-amber-50: #fff4e0;
+}
+
+html.high-contrast body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Strengthen borders and focus rings in high contrast so interactive
+   affordances never depend on subtle color differences. */
+html.high-contrast *:focus-visible {
+  outline: 3px solid #000000 !important;
+  outline-offset: 2px;
+}
