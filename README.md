@@ -11,8 +11,7 @@
 ---
 
 ### Demo
-
-<video src="https://github.com/marcebd/utzilCare-voice/raw/main/docs/demo.mp4" controls width="100%"></video>
+https://github.com/user-attachments/assets/062da453-db40-436d-bef5-92eed9f9ed04
 
 ---
 
