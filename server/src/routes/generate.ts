@@ -57,6 +57,8 @@ generateRouter.post(
         doctorName,
         voiceId,
         agentId: null,
+        agentIdEs: null,
+        agentIdEn: null,
         instructionEs,
         instructionEn,
         createdAt: new Date().toISOString(),

@@ -21,6 +21,8 @@ export interface SessionResponse {
   sessionId: string;
   doctorName: string;
   agentId: string | null;
+  agentIdEs: string | null;
+  agentIdEn: string | null;
   instructionEs: string;
   instructionEn: string;
   audioUrlEs: string;

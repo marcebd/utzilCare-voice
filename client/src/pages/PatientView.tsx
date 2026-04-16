@@ -167,7 +167,7 @@ export default function PatientView() {
             <PatientConversation
               sessionId={session.sessionId}
               language={language}
-              disabled={!session.agentId}
+              disabled={!session.agentIdEs && !session.agentIdEn && !session.agentId}
             />
           </div>
 

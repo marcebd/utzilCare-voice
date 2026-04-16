@@ -6,6 +6,8 @@ export interface SessionRecord {
   doctorName: string;
   voiceId: string;
   agentId: string | null;
+  agentIdEs: string | null;
+  agentIdEn: string | null;
   instructionEs: string;
   instructionEn: string;
   createdAt: string;

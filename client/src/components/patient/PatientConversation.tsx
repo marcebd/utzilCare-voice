@@ -89,6 +89,7 @@ export default function PatientConversation({
   const [isStarting, setIsStarting] = useState(false);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const hasConnectedOnce = useRef(false);
+  const activeLangRef = useRef<Language | null>(null);
 
   const handleMessage = useCallback((msg: unknown) => {
     const m = msg as ConvaiMessage;
@@ -125,15 +126,11 @@ export default function PatientConversation({
   const isConnected = status === 'connected';
   const isConnecting = status === 'connecting' || isStarting;
 
-  const connectWithLanguage = useCallback(
+  const connectForLanguage = useCallback(
     async (lang: Language) => {
-      const { signedUrl } = await getConvaiSignedUrl(sessionId);
-      await conversation.startSession({
-        signedUrl,
-        overrides: {
-          agent: { language: lang },
-        },
-      });
+      const { signedUrl } = await getConvaiSignedUrl(sessionId, lang);
+      await conversation.startSession({ signedUrl });
+      activeLangRef.current = lang;
     },
     [sessionId, conversation],
   );
@@ -143,7 +140,7 @@ export default function PatientConversation({
     setErrorMessage(null);
     setIsStarting(true);
     try {
-      await connectWithLanguage(language);
+      await connectForLanguage(language);
       hasConnectedOnce.current = true;
     } catch (err) {
       handleError(err);
@@ -156,19 +153,19 @@ export default function PatientConversation({
     try {
       await conversation.endSession();
       hasConnectedOnce.current = false;
+      activeLangRef.current = null;
     } catch (err) {
       console.error('[convai] end session failed', err);
     }
   };
 
-  // When language toggles while connected, reconnect with the new language
-  // override so the STT pipeline switches.
+  // When language toggles while connected, reconnect to the agent for that language.
   const prevLangRef = useRef(language);
   useEffect(() => {
     if (prevLangRef.current === language) return;
     prevLangRef.current = language;
     if (!hasConnectedOnce.current) return;
-    if (status !== 'connected' && status !== 'connecting') return;
+    if (activeLangRef.current === language) return;
 
     let cancelled = false;
     setIsReconnecting(true);
@@ -177,7 +174,7 @@ export default function PatientConversation({
       try {
         await conversation.endSession();
         if (cancelled) return;
-        await connectWithLanguage(language);
+        await connectForLanguage(language);
       } catch (err) {
         if (!cancelled) {
           handleError(err);
@@ -189,7 +186,7 @@ export default function PatientConversation({
     return () => {
       cancelled = true;
     };
-  }, [language, status, conversation, connectWithLanguage, handleError]);
+  }, [language, conversation, connectForLanguage, handleError]);
 
   const sendText = () => {
     const trimmed = textInput.trim();
