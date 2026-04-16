@@ -179,6 +179,29 @@ export async function generateSpeech(params: {
   return Buffer.from(arrayBuffer);
 }
 
+export async function getConversationSignedUrl(agentId: string): Promise<string> {
+  const url = `${BASE_URL}/v1/convai/conversation/get_signed_url?agent_id=${encodeURIComponent(agentId)}`;
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: { 'xi-api-key': apiKey() },
+  });
+
+  if (!res.ok) {
+    const errBody = await readBodySafe(res);
+    throw mapElevenLabsError(res.status, errBody);
+  }
+
+  const json = (await res.json()) as { signed_url?: string };
+  if (!json.signed_url) {
+    throw new ApiError(
+      502,
+      'elevenlabs_unavailable',
+      'ElevenLabs returned no signed URL for the conversation.',
+    );
+  }
+  return json.signed_url;
+}
+
 export async function createConversationalAgent(params: {
   name: string;
   voiceId: string;

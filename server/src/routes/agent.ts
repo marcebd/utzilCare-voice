@@ -1,7 +1,10 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import { z } from 'zod';
 import { ApiError } from '../lib/api-error.js';
-import { createConversationalAgent } from '../lib/elevenlabs.js';
+import {
+  createConversationalAgent,
+  getConversationSignedUrl,
+} from '../lib/elevenlabs.js';
 import { getSessionStore } from '../lib/sessions.js';
 import type { Language } from '../types.js';
 
@@ -81,6 +84,35 @@ agentRouter.post(
       await store.patch(sessionId, { agentId });
 
       res.json({ agentId });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+agentRouter.post(
+  '/sessions/:id/convai-url',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const sessionId = String(req.params.id);
+      const session = await getSessionStore().get(sessionId);
+      if (!session) {
+        throw new ApiError(
+          404,
+          'session_not_found',
+          'This session was not found or has expired. Ask your clinician to generate a new link.',
+        );
+      }
+      if (!session.agentId) {
+        throw new ApiError(
+          409,
+          'audio_not_ready',
+          'A conversational assistant was not set up for this session.',
+        );
+      }
+
+      const signedUrl = await getConversationSignedUrl(session.agentId);
+      res.json({ signedUrl, agentId: session.agentId });
     } catch (err) {
       next(err);
     }

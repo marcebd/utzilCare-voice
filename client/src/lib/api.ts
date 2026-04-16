@@ -104,6 +104,21 @@ export async function generateInstructions(params: {
   return (await res.json()) as GenerateInstructionsResponse;
 }
 
+export async function getConvaiSignedUrl(
+  sessionId: string,
+): Promise<{ signedUrl: string; agentId: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/api/sessions/${sessionId}/convai-url`, {
+      method: 'POST',
+    });
+  } catch (err) {
+    networkError(err);
+  }
+  await throwIfError(res);
+  return (await res.json()) as { signedUrl: string; agentId: string };
+}
+
 export async function createAgent(params: {
   sessionId: string;
   language: Language;

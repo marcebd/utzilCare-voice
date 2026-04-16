@@ -4,6 +4,7 @@ import { ApiClientError, audioUrl, getSession } from '../lib/api';
 import type { Language, SessionResponse, Speed } from '../types';
 import AudioPlayer from '../components/patient/AudioPlayer';
 import LanguageToggle from '../components/patient/LanguageToggle';
+import PatientConversation from '../components/patient/PatientConversation';
 
 function parseLang(value: string | null): Language {
   return value === 'en' ? 'en' : 'es';
@@ -156,6 +157,14 @@ export default function PatientView() {
               {currentText}
             </p>
           </section>
+
+          <div className="mt-6">
+            <PatientConversation
+              sessionId={session.sessionId}
+              language={language}
+              disabled={!session.agentId}
+            />
+          </div>
 
           <footer className="mt-8 flex flex-wrap items-center justify-between gap-3 text-xs text-stone-500">
             <p className="font-mono">
