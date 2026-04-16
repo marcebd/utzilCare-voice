@@ -118,6 +118,14 @@ export default function PatientConversation({
   const isConnected = status === 'connected';
   const isConnecting = status === 'connecting' || isStarting;
 
+  useEffect(() => {
+    if (status !== 'connected') return;
+    const langName = language === 'es' ? 'Spanish' : 'English';
+    conversation.sendContextualUpdate(
+      `The patient has switched to ${langName}. From now on, respond only in ${langName}.`,
+    );
+  }, [language, status, conversation]);
+
   const startConversation = async () => {
     if (disabled || isStarting || isConnected) return;
     setErrorMessage(null);
