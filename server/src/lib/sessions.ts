@@ -7,7 +7,7 @@ const KEY_PREFIX = 'utzilvoice:session:';
 const DEMO_SESSION: SessionRecord = {
   doctorName: 'Dr. García',
   voiceId: '21m00Tcm4TlvDq8ikWAM',
-  agentId: null,
+  agentId: 'agent_1101kp9xz4p5edwt8r83bwq9tg10',
   instructionEs:
     'Mantenga la herida limpia y seca. Cambie el vendaje una vez al día, o cada vez que se moje o ensucie. Lávese las manos antes y después de tocar la herida. No aplique ninguna crema ni ungüento a menos que yo se lo haya indicado.\n\nTome el medicamento para el dolor cada ocho horas, con comida. Tome el antibiótico tres veces al día hasta terminarlo, aunque se sienta mejor. No se salte dosis.\n\nDurante los primeros tres días, coma solo alimentos blandos y fríos. Beba mucha agua. Evite alimentos picantes, duros o muy calientes.\n\nVaya a la clínica o llámeme inmediatamente si tiene: fiebre mayor a 38.3°C, sangrado abundante, dolor que empeora, pus o mal olor de la herida, o dificultad para respirar.\n\nSu próxima cita es en siete días.',
   instructionEn:
