@@ -2,8 +2,10 @@
 
 > ElevenLabs + UtzilCare = Voice interface for post-operative care instructions.
 
-**Live demo** — https://utzilcare-voice.vercel.app
-**API** — https://utzilcare-voiceserver-production.up.railway.app
+**Live demo** — https://utzilcare-voice.vercel.app 
+
+**API** — https://utzilcare-voiceserver-production.up.railway.app 
+
 **Repo** — https://github.com/marcebd/utzilCare-voice
 
 ---
@@ -16,8 +18,8 @@ UtzilCare Voice closes that gap. Before discharge, the clinician records 30 seco
 
 This is not hypothetical. Two peer-reviewed publications documented this gap in cleft palate post-operative care in Guatemala:
 
-- American Cleft Palate-Craniofacial Association, 2023 — *add exact citation / DOI when filing*
-- American Cleft Palate-Craniofacial Association, 2024 — *add exact citation / DOI when filing*
+- American Cleft Palate-Craniofacial Association, 2023 — *https://doi.org/10.1097/scs.0000000000009539*
+- American Cleft Palate-Craniofacial Association, 2024 — *https://doi.org/10.1177/10556656221100052*
 
 The findings: patients frequently cannot read written instructions, rarely hear from their doctor again after discharge, and have no mechanism to ask follow-up questions in the language they actually speak.
 
