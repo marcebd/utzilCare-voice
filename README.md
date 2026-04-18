@@ -202,7 +202,7 @@ utzilCare-voice/
 
 ## Credits
 
-Built as a project by [Marcela Billingslea](https://github.com/marcebd). Clinical motivation from ongoing work with **UtzilCare**, a HIPAA-compliant clinic management platform for healthcare providers in Guatemala. Design language shared with UtzilCare's Ceiba system — forest greens for grounding, amber for the Guatemalan sun, warm cream for the earth.
+Built as a project by [Marcela Billingslea](https://github.com/marcebd). Clinical motivation from ongoing work with **UtzilCare**, a clinic management platform for healthcare providers in Latin America, engineered to HIPAA-grade standards. Design language shared with UtzilCare's Ceiba system — forest greens for grounding, amber for the Guatemalan sun, warm cream for the earth.
 
 ## License
 
